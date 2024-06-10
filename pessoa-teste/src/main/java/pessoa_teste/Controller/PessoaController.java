@@ -1,6 +1,9 @@
 package pessoa_teste.Controller;
 
 import java.util.List;
+import java.util.Optional;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,20 +43,21 @@ public class PessoaController {
     }
 
     @PutMapping("/{id}")
-    public Pessoa replacePessoa(@RequestBody Pessoa newPessoa, @PathVariable Long id){
-        return repository.findById(id)
-                .map(pessoa -> {
-                    pessoa.setName(newPessoa.getName());
-                    pessoa.setAge(newPessoa.getAge());
-                    pessoa.setHeight(newPessoa.getHeight());
-                    pessoa.setHeight(newPessoa.getHeight());
-                    return repository.save(pessoa);
-                })
-                .orElseGet(() -> {
-                    newPessoa.setId(id);
-                    return repository.save(newPessoa);
-                });
+    public Pessoa replacePessoa(@RequestBody Pessoa newPessoa, @PathVariable Long id) {
+        Optional<Pessoa> optionalPessoa = repository.findById(id);
+        if (optionalPessoa.isPresent()) {
+            Pessoa pessoa = optionalPessoa.get();
+            pessoa.setName(newPessoa.getName());
+            pessoa.setAge(newPessoa.getAge());
+            pessoa.setHeight(newPessoa.getHeight());
+            pessoa.setHeight(newPessoa.getHeight());
+            return repository.save(pessoa);
+        } else {
+            newPessoa.setId(id);
+            return repository.save(newPessoa);
     }
+}
+
 
     @DeleteMapping("/{id}")
     public void deletePessoa(@PathVariable Long id) {
