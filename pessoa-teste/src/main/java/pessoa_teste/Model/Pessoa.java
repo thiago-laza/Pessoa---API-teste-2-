@@ -9,7 +9,7 @@ public class Pessoa {
     private @Id @GeneratedValue Long id;
     private String name;
     private int age;
-    private Double weiht;
+    private Double weight;
     private Double height;
 
     Pessoa(){}
@@ -17,7 +17,7 @@ public class Pessoa {
     Pessoa(String name, int age, Double weight, Double height){
         this.name = name;
         this.age = age;
-        this.weiht = weight;
+        this.weight = weight;
         this.height = height;
     }
 
@@ -45,12 +45,12 @@ public class Pessoa {
         this.age = age;
     }
 
-    public Double getWeiht() {
-        return weiht;
+    public Double getWeight() {
+        return weight;
     }
 
-    public void setWeiht(Double weiht) {
-        this.weiht = weiht;
+    public void setWeight(Double weight) {
+        this.weight = weight;
     }
 
     public Double getHeight() {
