@@ -3,24 +3,35 @@ package pessoa_teste.Model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 public class Pessoa {
-    private @Id @GeneratedValue Long id;
+    @Id
+    @GeneratedValue
+    private Long id;
     private String name;
     private int age;
     private Double weight;
     private Double height;
 
-    Pessoa(){}
+    @OneToMany(mappedBy = "pessoa")
+    @JsonManagedReference
+    private List<Endereco> enderecos;
 
-    Pessoa(String name, int age, Double weight, Double height){
+    public Pessoa() {}
+
+    public Pessoa(String name, int age, Double weight, Double height) {
         this.name = name;
         this.age = age;
         this.weight = weight;
         this.height = height;
     }
 
+    
     public Long getId() {
         return id;
     }
@@ -61,5 +72,11 @@ public class Pessoa {
         this.height = height;
     }
 
-    
+    public List<Endereco> getEnderecos() {
+        return enderecos;
+    }
+
+    public void setEnderecos(List<Endereco> enderecos) {
+        this.enderecos = enderecos;
+    }
 }

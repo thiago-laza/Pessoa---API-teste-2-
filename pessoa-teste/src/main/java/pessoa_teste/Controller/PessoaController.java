@@ -3,65 +3,75 @@ package pessoa_teste.Controller;
 import java.util.List;
 import java.util.Optional;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import pessoa_teste.Model.Pessoa;
+import pessoa_teste.Model.Endereco;
 import pessoa_teste.Repository.PessoaRepository;
+import pessoa_teste.Repository.EnderecoRepository;
 
 @RestController
 @RequestMapping("/pessoas")
 public class PessoaController {
-    private final PessoaRepository repository;
+    private final PessoaRepository pessoaRepository;
+    private final EnderecoRepository enderecoRepository;
 
     @Autowired
-    public PessoaController(PessoaRepository repository){
-        this.repository = repository;
+    public PessoaController(PessoaRepository pessoaRepository, EnderecoRepository enderecoRepository) {
+        this.pessoaRepository = pessoaRepository;
+        this.enderecoRepository = enderecoRepository;
     }
 
     @GetMapping
-    public List<Pessoa> all(){
-        return repository.findAll();
+    public List<Pessoa> all() {
+        return pessoaRepository.findAll();
     }
 
     @PostMapping
-    public Pessoa newPessoa(@RequestBody Pessoa newPessoa){
-        return repository.save(newPessoa);
+    public Pessoa newPessoa(@RequestBody Pessoa newPessoa) {
+        return pessoaRepository.save(newPessoa);
     }
 
     @GetMapping("/{id}")
-    public Pessoa one(@PathVariable Long id){
-        return repository.findById(id).orElse(null);
+    public Pessoa one(@PathVariable Long id) {
+        return pessoaRepository.findById(id).orElse(null);
     }
 
     @PutMapping("/{id}")
     public Pessoa replacePessoa(@RequestBody Pessoa newPessoa, @PathVariable Long id) {
-        Optional<Pessoa> optionalPessoa = repository.findById(id);
-        if (optionalPessoa.isPresent()) {
-            Pessoa pessoa = optionalPessoa.get();
-            pessoa.setName(newPessoa.getName());
-            pessoa.setAge(newPessoa.getAge());
-            pessoa.setHeight(newPessoa.getHeight());
-            pessoa.setHeight(newPessoa.getHeight());
-            return repository.save(pessoa);
-        } else {
-            newPessoa.setId(id);
-            return repository.save(newPessoa);
+        return pessoaRepository.findById(id)
+                .map(pessoa -> {
+                    pessoa.setName(newPessoa.getName());
+                    pessoa.setAge(newPessoa.getAge());
+                    pessoa.setWeight(newPessoa.getWeight());
+                    pessoa.setHeight(newPessoa.getHeight());
+                    return pessoaRepository.save(pessoa);
+                })
+                .orElseGet(() -> {
+                    newPessoa.setId(id);
+                    return pessoaRepository.save(newPessoa);
+                });
     }
-}
-
 
     @DeleteMapping("/{id}")
     public void deletePessoa(@PathVariable Long id) {
-        repository.deleteById(id);
+        pessoaRepository.deleteById(id);
+    }
+
+    @GetMapping("/{id}/enderecos")
+    public List<Endereco> getEnderecos(@PathVariable Long id) {
+        Optional<Pessoa> pessoa = pessoaRepository.findById(id);
+        return pessoa.map(Pessoa::getEnderecos).orElse(null);
+    }
+
+    @PostMapping("/{id}/enderecos")
+    public Endereco addEndereco(@PathVariable Long id, @RequestBody Endereco newEndereco) {
+        return pessoaRepository.findById(id)
+                .map(pessoa -> {
+                    newEndereco.setPessoa(pessoa);
+                    return enderecoRepository.save(newEndereco);
+                })
+                .orElse(null);
     }
 }
-
